@@ -6,7 +6,7 @@ uvicorn[standard]==0.30.6
 sqlalchemy==2.0.35
 alembic==1.13.2
 asyncpg==0.30.0        # high-speed async driver
-# psycopg2-binary==2.9.9 # optional, local debugging/migrations
+psycopg2
 
 # Data validation and settings
 pydantic==2.9.2
