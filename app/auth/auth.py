@@ -6,6 +6,7 @@ from jose import JWTError, jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
+from passlib.context import CryptContext
 
 from app.database import get_db
 from app.models.models import User, OTPLogin
@@ -13,7 +14,10 @@ from app.schemas.schemas import TokenData
 from app.config import settings
 
 # OAuth2 scheme for token authentication
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/admin-login")
+
+# Password hashing context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OTP generation and verification functions
 def generate_otp(length: int = 6) -> str:
@@ -31,14 +35,41 @@ def verify_otp(otp_code: str, stored_otp: str, expires_at: datetime) -> bool:
         return False
     return otp_code == stored_otp
 
-# Legacy password functions (for compatibility)
+# Password hashing and verification functions
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Legacy function - now returns False as we use OTP authentication"""
-    return False
+    """Verify a plain password against a hashed password"""
+    if not hashed_password:
+        return False
+    
+    try:
+        result = pwd_context.verify(plain_password, hashed_password)
+        return result
+    except Exception as e:
+        return False
 
 def get_password_hash(password: str) -> str:
-    """Legacy function - now returns empty string as we use OTP authentication"""
-    return ""
+    """Hash a password for storing in the database"""
+    return pwd_context.hash(password)
+
+def authenticate_user_with_password(db: Session, email: str, password: str) -> Optional[User]:
+    """Authenticate user using email and password"""
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        return None
+    
+    # Check if user is active
+    if not user.is_active:
+        return None
+    
+    # Check if user has password
+    if not user.password:
+        return None
+    
+    # Verify password
+    if not verify_password(password, user.password):
+        return None
+    
+    return user
 
 def authenticate_user(db: Session, mobile: str, otp_code: str) -> Optional[User]:
     """Authenticate user using mobile number and OTP"""
@@ -94,16 +125,30 @@ async def get_current_user(db: Session = Depends(get_db), token: str = Depends(o
         raise credentials_exception
     return user
 
-# Function to check if user is admin
+# Function to check if user is admin or super admin
 async def get_admin_user(current_user: User = Depends(get_current_user)):
-    if current_user.role != "admin":
+    if current_user.role not in ["admin", "super_admin"]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Not enough permissions"
         )
     return current_user
 
-# Function to get current active user (for compatibility)
+# Function to check if user is super admin
+async def get_super_admin_user(current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Super admin permissions required"
+        )
+    return current_user
+
+# Function to get current active user
 async def get_current_active_user(current_user: User = Depends(get_current_user)):
-    """Get current active user - all users are considered active in OTP system"""
+    """Get current active user - check if user is active"""
+    if not current_user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Inactive user"
+        )
     return current_user

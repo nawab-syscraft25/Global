@@ -129,8 +129,26 @@ def verify_otp_handler(request: UserOTPVerify, db: Session = Depends(get_db)):
 def admin_login_with_password(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     """Login with email and password - Only for admin and super_admin"""
     
+    # Debug logging
+    print(f"[DEBUG] Admin login attempt:")
+    print(f"[DEBUG] Username: '{form_data.username}'")
+    print(f"[DEBUG] Username repr: {repr(form_data.username)}")
+    print(f"[DEBUG] Password: '{form_data.password}'")
+    print(f"[DEBUG] Password repr: {repr(form_data.password)}")
+    print(f"[DEBUG] Password length: {len(form_data.password) if form_data.password else 0}")
+    
+    # Let's test the exact password we expect
+    expected_password = "khan@123"
+    print(f"[DEBUG] Expected password: '{expected_password}'")
+    print(f"[DEBUG] Expected password repr: {repr(expected_password)}")
+    print(f"[DEBUG] Password matches expected: {form_data.password == expected_password}")
+    
     # Authenticate user using email and password
     user = authenticate_user_with_password(db, form_data.username, form_data.password)
+    
+    print(f"[DEBUG] Authentication result: {'Success' if user else 'Failed'}")
+    if user:
+        print(f"[DEBUG] User found - ID: {user.id}, Role: {user.role}, Active: {user.is_active}")
     
     if not user:
         raise HTTPException(
@@ -141,6 +159,7 @@ def admin_login_with_password(form_data: OAuth2PasswordRequestForm = Depends(), 
     
     # Ensure user is admin or super_admin
     if user.role not in ["admin", "super_admin"]:
+        print(f"[DEBUG] Role check failed - User role: {user.role}")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This login is only for admin users. Normal users should use OTP login."
@@ -148,10 +167,13 @@ def admin_login_with_password(form_data: OAuth2PasswordRequestForm = Depends(), 
     
     # Check if user is active
     if not user.is_active:
+        print(f"[DEBUG] User is not active")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Your admin account is deactivated. Contact super admin."
         )
+    
+    print(f"[DEBUG] Creating access token for user {user.id}")
     
     # Create access token
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)

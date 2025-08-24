@@ -2,16 +2,30 @@ from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 from app.models.models import User, OTPLogin
 from app.schemas.schemas import UserCreate, UserOTPRequest
+from app.auth.auth import get_password_hash
 import random
 import string
 
 def create_user(db: Session, user: UserCreate):
     """Create a new user"""
+    # Determine if user should be active by default based on role
+    is_active = user.role in ["super_admin", "admin"]
+    
+    # Hash password if provided
+    hashed_password = None
+    if user.password:
+        hashed_password = get_password_hash(user.password)
+    
     db_user = User(
         name=user.name,
         email=user.email,
         mobile=user.mobile,
-        role=user.role
+        role=user.role,
+        password=hashed_password,
+        is_active=is_active,
+        email_verified=False,  # Default to False, can be verified later
+        created_at=datetime.utcnow(),
+        updated_at=datetime.utcnow()
     )
     db.add(db_user)
     db.commit()

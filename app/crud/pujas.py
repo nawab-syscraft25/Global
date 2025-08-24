@@ -1,3 +1,4 @@
+from decimal import Decimal
 from sqlalchemy.orm import Session, joinedload
 from app.models.models import Puja, PujaImage, Plan, PujaPlan, Chadawa, PujaChadawa
 from app.schemas.schemas import PujaCreate, PujaUpdate, PujaImageCreate, PlanCreate
@@ -84,8 +85,8 @@ def create_plan(db: Session, plan: PlanCreate):
         name=plan.name,
         description=plan.description,
         image_url=plan.image_url,
-        actual_price=plan.actual_price,
-        discounted_price=plan.discounted_price
+        actual_price=Decimal(str(plan.actual_price)),
+        discounted_price=Decimal(str(plan.discounted_price)) if plan.discounted_price is not None else None
     )
     db.add(db_plan)
     db.commit()

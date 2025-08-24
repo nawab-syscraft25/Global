@@ -3,6 +3,7 @@ from typing import List, Optional, Dict, Union
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
+import re
 
 # ==============================
 # Enum Classes for Validation
@@ -34,24 +35,81 @@ class UserBase(BaseModel):
     mobile: str = Field(..., pattern=r'^\+?[0-9]{10,15}$')
     role: UserRole = UserRole.USER
 
+    @validator('mobile', pre=True)
+    def clean_mobile(cls, v):
+        if v is None:
+            return v
+        # Remove spaces, dashes, and other non-digit characters except +
+        cleaned = re.sub(r'[^\+0-9]', '', str(v))
+        
+        # If it's exactly 10 digits (Indian mobile without country code), add +91
+        if len(cleaned) == 10 and cleaned.isdigit():
+            cleaned = '+91' + cleaned
+        
+        return cleaned
+
 class UserCreate(UserBase):
-    pass
+    password: Optional[str] = Field(None, min_length=8, max_length=255)
 
 class UserUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
     mobile: Optional[str] = Field(None, pattern=r'^\+?[0-9]{10,15}$')
+    password: Optional[str] = Field(None, min_length=8, max_length=255)
     role: Optional[UserRole] = None
+    is_active: Optional[bool] = None
+    email_verified: Optional[bool] = None
+
+    @validator('mobile', pre=True)
+    def clean_mobile(cls, v):
+        if v is None:
+            return v
+        # Remove spaces, dashes, and other non-digit characters except +
+        cleaned = re.sub(r'[^\+0-9]', '', str(v))
+        
+        # If it's exactly 10 digits (Indian mobile without country code), add +91
+        if len(cleaned) == 10 and cleaned.isdigit():
+            cleaned = '+91' + cleaned
+        
+        return cleaned
 
 class UserOTPRequest(BaseModel):
     mobile: str = Field(..., pattern=r'^\+?[0-9]{10,15}$')
+
+    @validator('mobile', pre=True)
+    def clean_mobile(cls, v):
+        if v is None:
+            return v
+        # Remove spaces, dashes, and other non-digit characters except +
+        cleaned = re.sub(r'[^\+0-9]', '', str(v))
+        
+        # If it's exactly 10 digits (Indian mobile without country code), add +91
+        if len(cleaned) == 10 and cleaned.isdigit():
+            cleaned = '+91' + cleaned
+        
+        return cleaned
 
 class UserOTPVerify(BaseModel):
     mobile: str = Field(..., pattern=r'^\+?[0-9]{10,15}$')
     otp_code: str
 
+    @validator('mobile', pre=True)
+    def clean_mobile(cls, v):
+        if v is None:
+            return v
+        # Remove spaces, dashes, and other non-digit characters except +
+        cleaned = re.sub(r'[^\+0-9]', '', str(v))
+        
+        # If it's exactly 10 digits (Indian mobile without country code), add +91
+        if len(cleaned) == 10 and cleaned.isdigit():
+            cleaned = '+91' + cleaned
+        
+        return cleaned
+
 class UserResponse(UserBase):
     id: int
+    is_active: bool
+    email_verified: bool
     created_at: datetime
     updated_at: datetime
 

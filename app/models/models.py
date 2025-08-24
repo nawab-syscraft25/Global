@@ -30,13 +30,22 @@ class User(Base):
     name = Column(String(100), nullable=False)
     email = Column(String(150), unique=True, nullable=True)
     mobile = Column(String(15), unique=True, nullable=False)
+    password = Column(String(255), nullable=True)  # Hashed password
     role = Column(String(20), default=UserRole.USER.value, nullable=False)
+    is_active = Column(Boolean, default=False, nullable=False)  # Default inactive for regular users
+    email_verified = Column(Boolean, default=False, nullable=False)  # Email verification status
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     # Relationships
     bookings = relationship("Booking", back_populates="user")
     otp_logins = relationship("OTPLogin", back_populates="user")
+    
+    def __init__(self, **kwargs):
+        # Set is_active to True by default for admin roles
+        if 'role' in kwargs and kwargs['role'] in [UserRole.SUPER_ADMIN.value, UserRole.ADMIN.value]:
+            kwargs.setdefault('is_active', True)
+        super().__init__(**kwargs)
 
 class OTPLogin(Base):
     __tablename__ = "otp_logins"
