@@ -9,7 +9,7 @@ setuptools
 sqlalchemy
 alembic
 asyncpg
-psycopg2
+psycopg2-binary
 greenlet
 
 # Data validation and settings
