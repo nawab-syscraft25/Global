@@ -2,18 +2,19 @@
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
 starlette==0.27.0
-gunicorn==21.2.0          # WSGI server for production
+gunicorn==21.2.0
 
 # Database + ORM
 sqlalchemy==2.0.23
 alembic==1.13.1
-asyncpg==0.29.0        # high-speed async driver
-psycopg2==2.9.10       # PostgreSQL adapter
-greenlet==3.2.4        # SQLAlchemy dependency
+asyncpg==0.29.0
+psycopg2==2.9.10
+greenlet==3.2.4
 
 # Data validation and settings
 pydantic==2.5.0
-pydantic-core==2.14.1
+# pydantic-core==2.14.1 → removed due to Python 3.13 incompatibility
+# Let pip resolve compatible pydantic-core automatically
 pydantic-settings==2.1.0
 python-dotenv==1.0.0
 annotated-types==0.7.0
@@ -73,7 +74,8 @@ pluggy==1.6.0
 watchfiles==1.1.0
 websockets==15.0.1
 httptools==0.6.4
-uvloop; sys_platform != "win32"  # Unix-only performance enhancement
+# uvloop is Unix-only
+uvloop; sys_platform != "win32"
 
 # Security dependencies
 cffi==1.17.1
