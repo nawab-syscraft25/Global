@@ -1,85 +1,82 @@
 # FastAPI and ASGI server
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-starlette==0.27.0
-gunicorn==21.2.0
+fastapi
+uvicorn[standard]
+starlette
+gunicorn
 
 # Database + ORM
-sqlalchemy==2.0.23
-alembic==1.13.1
-asyncpg==0.29.0
-psycopg2==2.9.10
-greenlet==3.2.4
+sqlalchemy
+alembic
+asyncpg
+psycopg2
+greenlet
 
 # Data validation and settings
-pydantic==2.5.0
-# pydantic-core==2.14.1 → removed due to Python 3.13 incompatibility
-# Let pip resolve compatible pydantic-core automatically
-pydantic-settings==2.1.0
-python-dotenv==1.0.0
-annotated-types==0.7.0
-typing-extensions==4.12.2
+pydantic
+pydantic-settings
+python-dotenv
+annotated-types
+typing-extensions
 
 # Authentication & Security
-python-jose[cryptography]==3.3.0
-python-multipart==0.0.6
-passlib[bcrypt]==1.7.4
-bcrypt==4.3.0
-cryptography==45.0.5
-pyasn1==0.6.1
-rsa==4.9.1
-ecdsa==0.19.1
+python-jose[cryptography]
+python-multipart
+passlib[bcrypt]
+bcrypt
+cryptography
+pyasn1
+rsa
+ecdsa
 
 # Payment integration
-razorpay==1.4.2
+razorpay
 
 # HTTP client for external APIs
-httpx==0.25.2
-httpcore==1.0.9
-h11==0.16.0
-anyio==3.7.1
-sniffio==1.3.1
-certifi==2025.8.3
-charset-normalizer==3.4.3
-idna==3.10
-requests==2.32.5
-urllib3==2.5.0
+httpx
+httpcore
+h11
+anyio
+sniffio
+certifi
+charset-normalizer
+idna
+requests
+urllib3
 
 # Email and OTP
-email-validator==2.1.0
-pyotp==2.9.0
-dnspython==2.7.0
+email-validator
+pyotp
+dnspython
 
 # Date and time handling
-python-dateutil==2.8.2
-six==1.17.0
+python-dateutil
+six
 
 # Template engine (used by Alembic)
-Mako==1.3.10
-MarkupSafe==3.0.2
+Mako
+MarkupSafe
 
 # Configuration and utilities
-click==8.2.1
-PyYAML==6.0.2
-colorama==0.4.6
+click
+PyYAML
+colorama
 
 # Testing
-pytest==7.4.3
-pytest-asyncio==0.21.1
-iniconfig==2.1.0
-packaging==25.0
-pluggy==1.6.0
+pytest
+pytest-asyncio
+iniconfig
+packaging
+pluggy
 
 # Development tools
-watchfiles==1.1.0
-websockets==15.0.1
-httptools==0.6.4
-# uvloop is Unix-only
+watchfiles
+websockets
+httptools
 uvloop; sys_platform != "win32"
 
 # Security dependencies
-cffi==1.17.1
-pycparser==2.21
-argon2-cffi==21.3.0
-argon2-cffi-bindings==21.2.0
-async-timeout==5.0.1
+cffi
+pycparser
+argon2-cffi
+argon2-cffi-bindings
+async-timeout
