@@ -4,6 +4,7 @@ uvicorn[standard]
 starlette
 gunicorn
 
+setuptools
 # Database + ORM
 sqlalchemy
 alembic
@@ -80,3 +81,4 @@ pycparser
 argon2-cffi
 argon2-cffi-bindings
 async-timeout
+
